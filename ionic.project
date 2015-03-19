@@ -1,4 +1,12 @@
 {
   "name": "DrupalTicket",
-  "app_id": "61899937"
+  "app_id": "61899937",
+  "gulpStartupTasks": [
+    "sass",
+    "watch"
+  ],
+  "watchPatterns": [
+    "www/**/*",
+    "!www/lib/**/*"
+  ]
 }
