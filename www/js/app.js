@@ -94,6 +94,17 @@ DrupalTicket.factory('Site', ['$resource', 'Config',
   }
 ]);
 
+DrupalTicket.factory('Ticket', ['$resource', 'Config',
+  function($resource, Config) {
+    return $resource(Config.endpointUrl + 'event-ticket/:code', { code: '@code' }, {
+      validate: {
+        method: 'POST',
+        url: Config.endpointUrl + 'event-ticket/:code/validate'
+      }
+    });
+  }
+]);
+
 /**
  * DrupalTicket Login
  */
@@ -166,16 +177,47 @@ DrupalTicket.config(function($stateProvider) {
   });
 });
 
-DrupalTicket.controller('scanController', ['$scope', '$rootScope', '$state', '$cordovaBarcodeScanner', 'Config', 'Site',
-  function($scope, $rootScope, $state, $cordovaBarcodeScanner, Config, Site) {
+DrupalTicket.controller('scanController', ['$scope', '$rootScope', '$state', '$cordovaBarcodeScanner', 'Config', 'Site', 'Ticket',
+  function($scope, $rootScope, $state, $cordovaBarcodeScanner, Config, Site, Ticket) {
     $scope.user = Site.user;
+    $scope.error;
+    $scanning = false;
 
-    document.addEventListener("deviceready", function () {
-      $cordovaBarcodeScanner.scan().then(function(barcodeData) {
-        $scope.barcode = barcodeData;
-      }, function(error) {
-        $scope.barcode = error;
-      });
-    }, false);
+    $scope.scan = function() {
+      document.addEventListener("deviceready", function () {
+        $cordovaBarcodeScanner.scan().then(function(barcodeData) {
+          // Stop if cancelled
+          if (barcodeData.cancelled) {
+            return false;
+          }
+
+          // Get the barcode
+          var code = barcodeData.text;
+
+          // Shouldn't be longer than 50 chars.
+          if(code.length > 50){
+            $scope.error = "Code too long";
+            return false;
+          }
+
+          return code;
+        }).then(function(code){
+
+          // Get the Ticket
+          return Ticket.get({
+            code: code
+          }).$promise;
+
+        }).then(function() {
+          return ticket.$validate(function(){
+            $scanning = false;
+          }).$promise;
+        }).then(function() {
+          // Validated!
+        }).catch(function(error) {
+          $scope.error = error;
+        });
+      }, false);
+    };
   }
 ]);
