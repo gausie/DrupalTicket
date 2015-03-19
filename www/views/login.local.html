@@ -1,0 +1,15 @@
+<ion-view view-title="Local Login">
+  <ion-content class="has-header padding" data-ng-controller="loginController">
+    <div class="list">
+      <label class="item item-input">
+        <input type="text" data-ng-model="username" placeholder="Username" />
+      </label>
+      <label class="item item-input">
+        <input type="password" data-ng-model="password" placeholder="Password" />
+      </label>
+    </div>
+    <div class="padding">
+      <button class="button button-block button-positive" data-ng-click="localLogin()">Log in</button>
+    </div>
+  </ion-content>
+</ion-view>
