@@ -1,6 +1,9 @@
 DrupalTicket
 ===========
 
+This is the very early stages of an app made using the Ionic framework to
+check tickets on the Drupal Commerce Event Ticket module.
+
 Server Configuration
 --------------------
 Services module with user login, logout, token and ticket functions enabled.
